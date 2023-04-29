@@ -9,7 +9,7 @@ import type { RouterOutputs } from "~/utils/api";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Image from "next/image";
-import { LoadingSpinner } from "~/components/loading";
+import { LoadingPage } from "~/components/loading";
 // Required, otherwise dayjs will not work
 dayjs.extend(relativeTime);
 
@@ -65,7 +65,7 @@ const PostView = (props: PostWithUser) => {
 const Feed = () => {
   const { data, isLoading: postsLoading } = api.posts.getAll.useQuery();
 
-  if (postsLoading) return <LoadingSpinner />;
+  if (postsLoading) return <LoadingPage />;
 
   if (!data) return <div>Something went wrong</div>;
 
@@ -87,8 +87,6 @@ const Home: NextPage = () => {
 
   if (!userLoaded) return <div />;
 
-
-
   return (
     <>
       <Head>
@@ -104,7 +102,6 @@ const Home: NextPage = () => {
                 <SignInButton />
               </div>
             )}
-
             {isSignedIn && <CreatePostWizard />}
           </div>
           <Feed />
