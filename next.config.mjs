@@ -8,7 +8,7 @@ await import("./src/env.mjs");
 const config = {
   reactStrictMode: true,
   images: {
-    domains: ["images.clerk.dev"]
+    domains: ["images.clerk.dev"],
   },
 
   /**
@@ -21,5 +21,16 @@ const config = {
     locales: ["en"],
     defaultLocale: "en",
   },
+
+
+  // Reduces build time on vercel significantly
+  // IMPORTANT: The .github/workflows/ci.yml file is required for this to work
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  swcMinify: true,
 };
 export default config;
