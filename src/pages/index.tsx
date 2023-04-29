@@ -4,6 +4,12 @@ import Head from "next/head";
 
 import { RouterOutputs, api } from "~/utils/api";
 
+// Setting up dayjs
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+// Required, otherwise dayjs will not work
+dayjs.extend(relativeTime);
+
 const CreatePostWizard = () => {
   const { user } = useUser();
   console.log(user);
@@ -31,9 +37,21 @@ const PostView = (props: PostWithUser) => {
   const { post, author } = props;
 
   return (
-    <div key={post.id} className="border-b border-slate-400 p-8">
-      <img src={author.profileImageUrl} alt="Profile Image" />
-      {post.content}
+    <div key={post.id} className="flex gap-3 border-b border-slate-400 p-4">
+      <img
+        src={author.profileImageUrl}
+        alt="Profile Image"
+        className="h-16 w-16 rounded-full"
+      />
+      <div className="flex flex-col">
+        <div className="flex gap-1 text-slate-300">
+          <span>{`@${author.username}`}</span>
+          <span className="font-thin">{`· ${dayjs(
+            post.createdAt
+          ).fromNow()}`}</span>
+        </div>
+        <span>{post.content}</span>
+      </div>
     </div>
   );
 };
@@ -68,7 +86,7 @@ const Home: NextPage = () => {
           </div>
           <div className="flex flex-col">
             {[...data, ...data]?.map((fullPost) => (
-              <PostView {...fullPost} key={fullPost.post.id}/>
+              <PostView {...fullPost} key={fullPost.post.id} />
             ))}
           </div>
         </div>
