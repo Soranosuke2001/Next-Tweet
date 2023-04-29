@@ -10,11 +10,17 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Image from "next/image";
 import { LoadingPage } from "~/components/loading";
+
+import { useState } from "react";
 // Required, otherwise dayjs will not work
 dayjs.extend(relativeTime);
 
 const CreatePostWizard = () => {
+  const [input, setInput] = useState("");
   const { user } = useUser();
+
+  // When calling mutate, this will throw an error if the input is not at least 1 character and at most 280 characters
+  const { mutate } = api.posts.create.useMutation();
 
   if (!user) return null;
 
@@ -30,7 +36,10 @@ const CreatePostWizard = () => {
       <input
         className="grow bg-transparent outline-none"
         placeholder="Type some emoji's!"
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
       />
+      <button onClick={() => mutate({ content: input })}>Post</button>
     </div>
   );
 };
@@ -56,7 +65,7 @@ const PostView = (props: PostWithUser) => {
             post.createdAt
           ).fromNow()}`}</span>
         </div>
-        <span>{post.content}</span>
+        <span className="text-2xl">{post.content}</span>
       </div>
     </div>
   );
