@@ -4,21 +4,13 @@ import { TRPCError } from "@trpc/server";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 import { z } from "zod";
+import { filterUserForClient } from "~/server/helpers/filterUserForClient";
 
 import {
   createTRPCRouter,
   privateProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
-
-// Filters the user info to only include the id, username, and profile image url
-const filterUserClient = (user: User) => {
-  return {
-    id: user.id,
-    username: user.username,
-    profileImageUrl: user.profileImageUrl,
-  };
-};
 
 // Ratelimits the posts route to 3 requests per minute
 const ratelimit = new Ratelimit({
@@ -41,7 +33,7 @@ export const postsRouter = createTRPCRouter({
       limit: 100,
     });
 
-    const users = userInfo.map(filterUserClient);
+    const users = userInfo.map(filterUserForClient);
 
     // Returns the posts and the user info
     return posts.map((post) => {
