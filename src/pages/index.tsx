@@ -9,6 +9,7 @@ import type { RouterOutputs } from "~/utils/api";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Image from "next/image";
+import { LoadingSpinner } from "~/components/loading";
 // Required, otherwise dayjs will not work
 dayjs.extend(relativeTime);
 
@@ -28,7 +29,7 @@ const CreatePostWizard = () => {
       />
       <input
         className="grow bg-transparent outline-none"
-        placeholder="Type some emoji's"
+        placeholder="Type some emoji's!"
       />
     </div>
   );
@@ -47,7 +48,6 @@ const PostView = (props: PostWithUser) => {
         className="h-16 w-16 rounded-full"
         width={56}
         height={56}
-
       />
       <div className="flex flex-col">
         <div className="flex gap-1 text-slate-300">
@@ -62,15 +62,32 @@ const PostView = (props: PostWithUser) => {
   );
 };
 
-const Home: NextPage = () => {
-  const { data, isLoading } = api.posts.getAll.useQuery();
+const Feed = () => {
+  const { data, isLoading: postsLoading } = api.posts.getAll.useQuery();
 
-  if (isLoading) return <div>Loading...</div>;
+  if (postsLoading) return <LoadingSpinner />;
 
   if (!data) return <div>Something went wrong</div>;
 
-  // Check if the user is signed in
-  const user = useUser();
+  return (
+    <div className="flex flex-col">
+      {data?.map((fullPost) => (
+        <PostView {...fullPost} key={fullPost.post.id} />
+      ))}
+    </div>
+  );
+};
+
+const Home: NextPage = () => {
+  // Fetch the user info
+  const { isLoaded: userLoaded, isSignedIn } = useUser();
+
+  // Fetch the data ASAP
+  api.posts.getAll.useQuery();
+
+  if (!userLoaded) return <div />;
+
+
 
   return (
     <>
@@ -82,19 +99,15 @@ const Home: NextPage = () => {
       <main className="flex h-screen justify-center">
         <div className="h-full w-full border-x border-slate-400 md:max-w-2xl">
           <div className="flex border-b border-slate-400 p-4">
-            {!user.isSignedIn && (
+            {!isSignedIn && (
               <div className="flex justify-center">
                 <SignInButton />
               </div>
             )}
 
-            {user.isSignedIn && <CreatePostWizard />}
+            {isSignedIn && <CreatePostWizard />}
           </div>
-          <div className="flex flex-col">
-            {data?.map((fullPost) => (
-              <PostView {...fullPost} key={fullPost.post.id} />
-            ))}
-          </div>
+          <Feed />
         </div>
       </main>
     </>
