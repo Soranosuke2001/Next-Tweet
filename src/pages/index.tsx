@@ -12,6 +12,7 @@ import Image from "next/image";
 import { LoadingPage } from "~/components/loading";
 
 import { useState } from "react";
+import { toast } from "react-hot-toast";
 // Required, otherwise dayjs will not work
 dayjs.extend(relativeTime);
 
@@ -27,7 +28,16 @@ const CreatePostWizard = () => {
       setInput("");
       // The "void" will ignore that the function returns a promise
       void ctx.posts.getAll.invalidate();
-    }
+    },
+    onError: (e) => {
+      const errorMessage = e.data?.zodError?.fieldErrors.content;
+
+      if (errorMessage && errorMessage[0]) {
+        toast.error(errorMessage[0]);
+      } else {
+        toast.error("Failed to post. Please try again later.");
+      }
+    },
   });
 
   if (!user) return null;

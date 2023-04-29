@@ -68,7 +68,8 @@ export const postsRouter = createTRPCRouter({
   create: privateProcedure
     .input(
       z.object({
-        content: z.string().emoji().min(1).max(280),
+        // We can add custom error messages by passing in a string to the validation function
+        content: z.string().emoji("Only Emoji's are accepted").min(1).max(280),
       })
     )
     .mutation(async ({ ctx, input }) => {
