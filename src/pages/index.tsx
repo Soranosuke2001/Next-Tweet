@@ -4,6 +4,27 @@ import Head from "next/head";
 
 import { api } from "~/utils/api";
 
+const CreatePostWizard = () => {
+  const { user } = useUser();
+  console.log(user)
+
+  if (!user) return null;
+
+  return (
+    <div className="flex w-full gap-3">
+      <img
+        className="h-16 w-16 rounded-full"
+        src={user.profileImageUrl}
+        alt="Profile Image"
+      />
+      <input
+        className="grow bg-transparent outline-none"
+        placeholder="Type some emoji's"
+      />
+    </div>
+  );
+};
+
 const Home: NextPage = () => {
   const { data, isLoading } = api.posts.getAll.useQuery();
 
@@ -24,15 +45,19 @@ const Home: NextPage = () => {
       <main className="flex h-screen justify-center">
         <div className="h-full w-full border-x border-slate-400 md:max-w-2xl">
           <div className="flex border-b border-slate-400 p-4">
-            {user.isSignedIn ? <SignOutButton /> : (
-            <div className='flex justify-center'>
-              <SignInButton />
-            </div>
+            {!user.isSignedIn && (
+              <div className="flex justify-center">
+                <SignInButton />
+              </div>
             )}
+
+            {user.isSignedIn && <CreatePostWizard />}
           </div>
-          <div className='flex flex-col'>
+          <div className="flex flex-col">
             {[...data, ...data]?.map((post) => (
-              <div key={post.id} className='p-8 border-b border-slate-400'>{post.content}</div>
+              <div key={post.id} className="border-b border-slate-400 p-8">
+                {post.content}
+              </div>
             ))}
           </div>
         </div>
