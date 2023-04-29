@@ -56,6 +56,14 @@ const CreatePostWizard = () => {
         placeholder="Type some emoji's!"
         value={input}
         onChange={(e) => setInput(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            if (input !== "") {
+              mutate({ content: input });
+            }
+          }
+        }}
         disabled={isPosting}
       />
       {input !== "" && !isPosting && (
@@ -64,7 +72,7 @@ const CreatePostWizard = () => {
         </button>
       )}
       {isPosting && (
-        <div className='flex justify-center items-center'>
+        <div className="flex items-center justify-center">
           <LoadingSpinner size={20} />
         </div>
       )}
