@@ -19,8 +19,16 @@ const CreatePostWizard = () => {
   const [input, setInput] = useState("");
   const { user } = useUser();
 
+  const ctx = api.useContext();
+
   // When calling mutate, this will throw an error if the input is not at least 1 character and at most 280 characters
-  const { mutate } = api.posts.create.useMutation();
+  const { mutate, isLoading: isPosting } = api.posts.create.useMutation({
+    onSuccess: () => {
+      setInput("");
+      // The "void" will ignore that the function returns a promise
+      void ctx.posts.getAll.invalidate();
+    }
+  });
 
   if (!user) return null;
 
@@ -38,6 +46,7 @@ const CreatePostWizard = () => {
         placeholder="Type some emoji's!"
         value={input}
         onChange={(e) => setInput(e.target.value)}
+        disabled={isPosting}
       />
       <button onClick={() => mutate({ content: input })}>Post</button>
     </div>
